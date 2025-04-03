@@ -1,7 +1,6 @@
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Platform, Dimensions } from 'react-native';
 import { Share2, Settings, CircleCheck, CreditCard as Edit3, Heart, Bookmark, Folder, Pencil, Users } from 'lucide-react-native';
 import { useFonts } from 'expo-font';
-import { Manrope_400Regular, Manrope_600SemiBold, Manrope_700Bold } from '@expo-google-fonts/manrope';
 import { useEffect, useState, useMemo } from 'react';
 import { SplashScreen } from 'expo-router';
 import Animated, { 
@@ -12,8 +11,8 @@ import Animated, {
 
 // Constants
 const ASSETS = {
-  BACKGROUND_IMAGE: require('./img1.png'), // Background image for profile section
-  PROFILE_IMAGE: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde', // New profile picture
+  BACKGROUND_IMAGE: require('./imga.gif'),
+  PROFILE_IMAGE: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde',
   COLLECTION_IMAGE: 'https://images.unsplash.com/photo-1623934199716-dc28818a6ec7',
   FLAG_IMAGE: 'https://flagcdn.com/w20/in.png',
 };
@@ -43,10 +42,25 @@ const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 export default function ProfileScreen() {
   const [activeTab, setActiveTab] = useState('collections');
+
+  // Debugging: Log the font paths
+  try {
+    const circularFont = require('../../assets/fonts/CircularStd-Light.ttf');
+    console.log('CircularStd-Light.ttf resolved:', circularFont);
+  } catch (error) {
+    console.error('Error resolving CircularStd-Light.ttf:', error);
+  }
+
+  try {
+    const cooperFont = require('../../assets/fonts/CooperHewitt-Medium.otf');
+    console.log('CooperHewitt-Medium.otf resolved:', cooperFont);
+  } catch (error) {
+    console.error('Error resolving CooperHewitt-Medium.otf:', error);
+  }
+
   const [fontsLoaded] = useFonts({
-    'Manrope-Regular': Manrope_400Regular,
-    'Manrope-SemiBold': Manrope_600SemiBold,
-    'Manrope-Bold': Manrope_700Bold,
+    'CircularStd-Light': require('../../assets/fonts/CircularStd-Light.ttf'),
+    'CooperHewitt-Medium': require('../../assets/fonts/CooperHewitt-Medium.otf'),
   });
 
   useEffect(() => {
@@ -107,10 +121,7 @@ export default function ProfileScreen() {
     <View style={styles.outerContainer}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Profile Section with Background */}
-        <View style={styles.profileContainer} onLayout={(event) => {
-          const { height } = event.nativeEvent.layout;
-          // Optionally, you can use this height to dynamically adjust if needed
-        }}>
+        <View style={styles.profileContainer}>
           <Image source={ASSETS.BACKGROUND_IMAGE} style={styles.backgroundImage} />
           <AnimatedView entering={FadeInDown.duration(600)} style={styles.profile}>
             <View style={styles.profileTopRow}>
@@ -119,7 +130,6 @@ export default function ProfileScreen() {
                   source={{ uri: ASSETS.PROFILE_IMAGE }}
                   style={styles.profileImage}
                 />
-                {/* Square Gradient Border */}
                 <View style={styles.gradientBorderOuter} />
                 <View style={styles.gradientBorderInner} />
               </View>
@@ -168,7 +178,7 @@ export default function ProfileScreen() {
           </AnimatedView>
         </View>
         
-        {/* Content Section without Background */}
+        {/* Content Section */}
         <AnimatedView entering={FadeInUp.duration(600).delay(300)} style={styles.content}>
           <View style={styles.tabs}>
             {TABS.map((tab) => (
@@ -188,7 +198,7 @@ export default function ProfileScreen() {
   );
 }
 
-// Tab, CollectionCard, and Footer components
+// Components
 const Tab = ({ id, icon: Icon, label, isActive, onPress }) => (
   <TouchableOpacity style={[styles.tab, isActive && styles.activeTab]} onPress={onPress}>
     <Icon size={16} color={isActive ? '#00ff9d' : '#888'} />
@@ -212,12 +222,11 @@ const Footer = () => (
   </AnimatedView>
 );
 
-// Styles with refined appearance to match reference UI
+// Styles
 const styles = StyleSheet.create({
   outerContainer: {
     flex: 1,
     backgroundColor: '#000',
-    fontFamily: 'Manrope-Regular',
   },
   container: { 
     flex: 1, 
@@ -225,16 +234,16 @@ const styles = StyleSheet.create({
   },
   profileContainer: {
     position: 'relative',
-    minHeight: 300, // Minimum height to ensure content fits
+    minHeight: 300,
   },
   backgroundImage: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0, // Extend to the bottom of profileContainer
+    bottom: 0,
     width: '100%',
-    height: '100%', // Dynamic height based on container
+    height: '100%',
     resizeMode: 'cover',
     zIndex: 0,
   },
@@ -258,26 +267,25 @@ const styles = StyleSheet.create({
   profileImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 0, // Square profile image
+    borderRadius: 0,
     zIndex: 2,
   },
-  // Square Gradient Border - using neon green as seen in image
   gradientBorderOuter: {
     position: 'absolute',
-    width: '110%', // Slightly larger to create a border effect
+    width: '110%',
     height: '110%',
-    borderRadius: 0, // Square border
-    backgroundColor: 'rgba(0, 255, 157, 0.2)', // Outer gradient-like effect
+    borderRadius: 0,
+    backgroundColor: 'rgba(0, 255, 157, 0.2)',
     zIndex: 1,
     top: -5,
     left: -5,
   },
   gradientBorderInner: {
     position: 'absolute',
-    width: '105%', // Inner gradient-like effect
+    width: '105%',
     height: '105%',
-    borderRadius: 0, // Square border
-    backgroundColor: 'rgba(0, 255, 157, 0.4)', // Inner gradient-like effect
+    borderRadius: 0,
+    backgroundColor: 'rgba(0, 255, 157, 0.4)',
     zIndex: 1,
     top: -3,
     left: -3,
@@ -297,7 +305,6 @@ const styles = StyleSheet.create({
   profileInfo: {
     gap: 8,
   },
-  // Name and edit button container
   nameAndEditContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -311,25 +318,23 @@ const styles = StyleSheet.create({
   username: { 
     color: '#fff', 
     fontSize: 18, 
-    fontFamily: 'Manrope-SemiBold'
+    fontFamily: 'CooperHewitt-Medium',
   },
-  // Updated edit button to be more visible with white text
   editButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)', // Subtle background instead of highlight
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     padding: 8,
     paddingHorizontal: 12,
     borderRadius: 4,
   },
   editButtonText: { 
-    color: '#fff', // Changed to white for better visibility
+    color: '#fff',
     fontSize: 10, 
-    fontFamily: 'Manrope-SemiBold', 
+    fontFamily: 'CooperHewitt-Medium', 
     letterSpacing: 0.5,
   },
-  // Location row
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -351,7 +356,7 @@ const styles = StyleSheet.create({
   locationText: { 
     color: '#fff', 
     fontSize: 11, 
-    fontFamily: 'Manrope-Regular', 
+    fontFamily: 'CircularStd-Light', 
     letterSpacing: 0.5,
   },
   bioContainer: {
@@ -361,17 +366,16 @@ const styles = StyleSheet.create({
   bio: { 
     color: '#ddd', 
     fontSize: 14, 
-    fontFamily: 'Manrope-Regular', 
+    fontFamily: 'CircularStd-Light', 
     lineHeight: 20,
   },
   statTransparent: {
     backgroundColor: 'transparent',
     paddingVertical: 8,
-    paddingHorizontal: 0, // Removed padding to move left
+    paddingHorizontal: 0,
     borderRadius: 0,
     alignSelf: 'flex-start',
   },
-  // Following container moved to the left
   followingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -380,13 +384,13 @@ const styles = StyleSheet.create({
   statNumber: { 
     color: '#fff', 
     fontSize: 16, 
-    fontFamily: 'Manrope-Bold',
+    fontFamily: 'CooperHewitt-Medium',
     textAlign: 'center',
   },
   statLabel: { 
-    color: '#fff', // Changed from #888 to white
+    color: '#fff',
     fontSize: 10, 
-    fontFamily: 'Manrope-Regular', 
+    fontFamily: 'CircularStd-Light', 
     letterSpacing: 0.5,
   },
   content: { 
@@ -395,11 +399,11 @@ const styles = StyleSheet.create({
   },
   tabs: {
     flexDirection: 'row',
-    marginHorizontal: 16,
+    width: '100%', // Extend to edge-to-edge
     marginBottom: 24,
-    backgroundColor: '#111', // Darker tab background
-    borderRadius: 0, // Square tab container
-    padding: 0, // Remove padding to match image
+    backgroundColor: '#111', // Background only for the tab height
+    borderRadius: 0,
+    padding: 0,
     height: 48, // Fixed height for tabs
   },
   tab: { 
@@ -412,15 +416,15 @@ const styles = StyleSheet.create({
     height: '100%', 
   },
   activeTab: { 
-    backgroundColor: 'transparent', // No background for active tab
+    backgroundColor: 'transparent',
     borderBottomWidth: 2,
     borderBottomColor: '#00ff9d',
-    borderRadius: 0, // Square active tab 
+    borderRadius: 0,
   },
   tabText: { 
     color: '#888', 
     fontSize: 12, 
-    fontFamily: 'Manrope-SemiBold', 
+    fontFamily: 'CooperHewitt-Medium', 
     letterSpacing: 0.5,
   },
   activeTabText: { 
@@ -436,10 +440,10 @@ const styles = StyleSheet.create({
     flex: 1 
   },
   collection: { 
-    borderRadius: 0, // Square collection 
+    borderRadius: 0,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#222', // Subtle border seen in image
+    borderColor: '#222',
   },
   collectionImage: { 
     width: '100%',
@@ -460,7 +464,7 @@ const styles = StyleSheet.create({
   collectionTitle: { 
     color: '#fff', 
     fontSize: 12, 
-    fontFamily: 'Manrope-SemiBold', 
+    fontFamily: 'CooperHewitt-Medium', 
     letterSpacing: 0.5,
   },
   filesSection: { 
@@ -476,7 +480,7 @@ const styles = StyleSheet.create({
   recommendationText: {
     color: '#888',
     fontSize: 12,
-    fontFamily: 'Manrope-Regular',
+    fontFamily: 'CircularStd-Light',
     marginBottom: 8,
     lineHeight: 18,
   },
@@ -491,18 +495,18 @@ const styles = StyleSheet.create({
   navItemTitle: { 
     color: '#fff', 
     fontSize: 13, 
-    fontFamily: 'Manrope-SemiBold',
+    fontFamily: 'CooperHewitt-Medium',
     marginBottom: 4,
   },
   navItemSubtitle: { 
     color: '#888', 
     fontSize: 11, 
-    fontFamily: 'Manrope-Regular' 
+    fontFamily: 'CircularStd-Light' 
   },
   arrowText: { 
     color: '#888', 
     fontSize: 18,
-    fontFamily: 'Manrope-Regular',
+    fontFamily: 'CircularStd-Light',
   },
   footer: { 
     alignItems: 'center', 
