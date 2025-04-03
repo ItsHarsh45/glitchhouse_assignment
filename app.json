@@ -32,6 +32,9 @@
     },
     "android": {
       "package": "com.its_harsh.boltexponativewind"
-    }
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ]
   }
 }
