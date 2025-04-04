@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Platform, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { Heart, Bookmark, Folder, Pencil } from 'lucide-react-native';
 import { useFonts } from 'expo-font';
 import { useEffect, useState, useMemo } from 'react';
@@ -8,7 +8,6 @@ import Animated, {
   FadeInUp, 
   FadeInRight,
 } from 'react-native-reanimated';
-import { Svg, Path } from 'react-native-svg';
 
 import CollectionsIcon from '../../assets/icons/CollectionsIcon.svg';
 import ManageTagsIcon from '../../assets/icons/ManageTagsIcon.svg';
@@ -18,7 +17,7 @@ import GreenTickIcon from '../../assets/icons/GreenTick.svg';
 import FollowingIcon from '../../assets/icons/Following.svg';
 
 const ASSETS = {
-  BACKGROUND_IMAGE: require('./imga.gif'),
+  BACKGROUND_IMAGE: require('./img1.png'),
   PROFILE_IMAGE: require('./pro.png'),
   COLLECTION_IMAGES: {
     liked: [
@@ -48,9 +47,9 @@ const COLLECTIONS = [
 ];
 
 const MANAGE_TAGS = [
-  { id: 'difficulty', title: 'YOUR DIFFICULTY', subtitle: 'Choose your challenge level', delay: 300 },
-  { id: 'interests', title: 'INTERESTS YOU LIKE', subtitle: 'Curated builds for your interests', delay: 400 },
-  { id: 'tools', title: 'TOOLS USED', subtitle: 'Tailored tool suggestions', delay: 500 },
+  { id: 'difficulty', title: 'YOUR DIFFICULTY✨', subtitle: 'Choose your challenge level', delay: 300 },
+  { id: 'interests', title: 'INTERESTS YOU LIKE✨', subtitle: 'Curated builds for your interests', delay: 400 },
+  { id: 'tools', title: 'TOOLS USED🛠️', subtitle: 'Tailored tool suggestions', delay: 500 },
 ];
 
 SplashScreen.preventAutoHideAsync();
@@ -61,16 +60,29 @@ const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 export default function ProfileScreen() {
   const [activeTab, setActiveTab] = useState('collections');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     'CircularStd-Light': require('../../assets/fonts/CircularStd-Light.ttf'),
     'CooperHewitt-Medium': require('../../assets/fonts/CooperHewitt-Medium.otf'),
   });
 
   useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
+    async function initialize() {
+      try {
+        setIsLoading(true);
+        if (fontsLoaded) {
+          await SplashScreen.hideAsync();
+        }
+      } catch (e) {
+        setError('Failed to initialize screen: ' + e.message);
+        console.error('Initialization error:', e);
+      } finally {
+        setIsLoading(false);
+      }
     }
+    initialize();
   }, [fontsLoaded]);
 
   const tabContent = useMemo(() => {
@@ -121,7 +133,33 @@ export default function ProfileScreen() {
     );
   }, [activeTab]);
 
-  if (!fontsLoaded) return null;
+  if (isLoading) {
+    return (
+      <View style={styles.outerContainer}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.outerContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
+  if (fontError) {
+    return (
+      <View style={styles.outerContainer}>
+        <Text style={styles.errorText}>Font loading failed: {fontError.message}</Text>
+      </View>
+    );
+  }
 
   const currentDate = new Date('2025-04-03');
   const joinDate = new Date(currentDate);
@@ -160,7 +198,7 @@ export default function ProfileScreen() {
             
             <View style={styles.profileInfo}>
               <View style={styles.nameAndEditContainer}>
-                <View style={ styles.nameContainer}>
+                <View style={styles.nameContainer}>
                   <Text style={styles.username}>@theo_from_hsr</Text>
                   <GreenTickIcon width={20} height={20} />
                 </View>
@@ -293,6 +331,20 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: 'transparent',
   },
+  loadingText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: 'CircularStd-Light',
+    textAlign: 'center',
+    padding: 20,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    fontFamily: 'CircularStd-Light',
+    textAlign: 'center',
+    padding: 20,
+  },
   profileContainer: {
     position: 'relative',
     minHeight: 300,
@@ -386,10 +438,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     padding: 8,
     paddingHorizontal: 12,
-    borderRadius: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#fff',
+    borderStyle: 'dashed',
   },
   editButtonText: { 
     color: '#fff',
@@ -522,13 +575,6 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#fff',
   },
-  gridLineVertical: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: 1,
-    backgroundColor: '#fff',
-  },
   footerLogo: {
     width: 100,
     height: 30,
@@ -539,7 +585,7 @@ const styles = StyleSheet.create({
   joinedText: {
     color: '#888',
     fontSize: 12,
-    fontFamily: 'CircularStd-Light',
+    fontFamily: 'CooperHewitt-Medium',
     letterSpacing: 0.5,
     zIndex: 1,
   },
