@@ -10,3 +10,4 @@ make sure your pc has installed jdk and gradle else install quick via choco
 8. npx expo start
 (make sure both pc and phone are on same network and manually add url to he Expo Go app)
 9. eas build --profile development --platform android
+https://expo.dev/accounts/its_harsh/projects/bolt-expo-nativewind/builds/4ad06f70-7315-4bba-89af-a8dcfac7a306
